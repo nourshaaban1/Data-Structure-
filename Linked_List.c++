@@ -14,7 +14,7 @@ public:
 };
 
 template<typename T>
-class SingleLinkedList {
+class singleLinkedList {
 private:
 
     Node<T>* head = NULL;
@@ -61,6 +61,7 @@ public:
     void insertAt(T element, int index) {
         if(index < 0 || index > size) {
             cout << "Invalid Index" << endl;
+            return;
         }
         else if(index == 0) {
             insertAtHead(element);
@@ -87,6 +88,7 @@ public:
     void removeAtHead(){
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             Node<T>* del = head;
@@ -99,6 +101,7 @@ public:
     void removeAtTail() {
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             Node<T>* prev = head;
@@ -116,7 +119,8 @@ public:
 
     void removeAt(int index) {
         if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+            cout << "Invalid Range";
+            return;    
         }
         else if(index == 0) {removeAtHead();}
         else if(index == size - 1) {removeAtTail();}
@@ -138,6 +142,7 @@ public:
         Node<T>* current = head;
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             while (current != NULL)
@@ -167,6 +172,7 @@ public:
     bool isExist(T element) {
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return false;
         }
         Node<T>* current = head;
         while (current != NULL)
@@ -179,32 +185,58 @@ public:
         return false; 
     }
 
+    bool isItemAtEqual(T element, int index) {
+       if(index < 0 || index >= size) {
+            cout << "Invalid Range";
+            return false;    
+        }
+        else if(this->isEmpty()) {
+            cout << "List Is Empty!" << endl;
+            return false;
+        }
+        Node<T>* current = head;
+        for(int i = 0;i < index;i++)
+            current = current->next;
+
+        return current->data == element; 
+    }
+    
     bool isEmpty() {return head == NULL;}
 // Boolean Functions End 
 
 // Retrieve, Replace & Swap Funcations Start
     T retrieveAt(int index) {
-        if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+        if (index < 0 || index >= size) {
+            throw out_of_range("Invalid Range");
         }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
+
+        if (this->isEmpty()) {
+            throw runtime_error("List Is Empty!");
         }
-        else {
-            Node<T>* current = head;
-            for(int i = 0;i < index;i++)
-                current = current->next;
-            
-            return current->data;
-        }  
+
+        Node<T>* current = head;
+        for (int i = 0; i < index; i++) {
+            if (current == NULL) {
+                throw out_of_range("Invalid Range");
+            }
+            current = current->next;
+        }
+
+        if (current == NULL) {
+            throw out_of_range("Invalid Range");
+        }
+
+        return current->data;  
     }
 
     void replaceAt(T newElement, int index) {
         if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+            cout << "Invalid Range";
+            return;    
         }
         else if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             Node<T>* current = head;
@@ -215,42 +247,50 @@ public:
         }    
     }
 
-    bool isItemAtEqual(T element, int index) {
-       if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
-        }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
-        }
-        else {
-            Node<T>* current = head;
-            for(int i = 0;i < index;i++)
-                current = current->next;
-
-            return current->data == element;
-        }  
-    }
-
     void swap (int firstIndex, int secondIndex) {
         if((firstIndex < 0 || firstIndex >= size) && (secondIndex < 0 || secondIndex >= size)) {
-            cout << "Invalid Range";    
+            cout << "Invalid Range" << endl;
+            return;    
         }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
-        }
-        else {
-            Node<T>* firstNode = head; 
-            Node<T>* secondNode = head;
-            Node<T>* temp = NULL;
-            for(int i = 0;i < firstIndex;i++) 
-                firstNode = firstNode->next;
-            for(int i = 0;i < secondIndex;i++) 
-                secondNode = secondNode->next;
 
-            temp = firstNode->next;
-            firstNode->next = secondNode->next;
-            secondNode->next = temp;
-        }          
+        if(this->isEmpty()) {
+            cout << "List Is Empty!" << endl;
+            return;
+        }
+        
+        if(firstIndex == secondIndex) {
+            return;
+        } 
+
+        Node<T>* prevFirstNode = NULL;
+        Node<T>* firstNode = head;
+        for (int i = 0; i < firstIndex; ++i) {
+            prevFirstNode = firstNode;
+            firstNode = firstNode->next;
+        }
+        
+        Node<T>* prevSecondNode = nullptr;
+        Node<T>* secondNode = head;
+        for (int i = 0; i < secondIndex; ++i) {
+            prevSecondNode = secondNode;
+            secondNode = secondNode->next;
+        }
+
+        if (prevFirstNode != NULL) {
+        prevFirstNode->next = secondNode;
+        } else {
+            head = secondNode;
+        }
+
+        if (prevSecondNode != NULL) {
+            prevSecondNode->next = firstNode;
+        } else {
+            head = firstNode;
+        }
+
+        Node<T>* temp = secondNode->next;
+        secondNode->next = firstNode->next;
+        firstNode->next = temp;                
     }
 
 // Retrieve, Replace & Swap Funcations End
@@ -279,6 +319,7 @@ public:
         }
         else {
             newNode->next = head;
+            head->previous = newNode;
             head = newNode;
         }
     }
@@ -295,6 +336,7 @@ public:
         }
         else {
             newNode->previous = tail;
+            tail->next = newNode;
             tail = newNode;
         }
     }
@@ -302,6 +344,7 @@ public:
     void insertAt(T element, int index) {
         if(index < 0 || index > size) {
             cout << "Invalid Index" << endl;
+            return;
         }
         else if(index == 0) {
             insertAtHead(element);
@@ -315,7 +358,7 @@ public:
             
             Node<T>* current = head;
             Node<T>* prev = head;
-            for(int i = 0; i < index - 1; i++) {
+            for(int i = 0; i < index; i++) {
                 prev = current;
                 current = current->next;
             }
@@ -332,6 +375,7 @@ public:
     void removeAtHead(){
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             Node<T>* del = head;
@@ -346,6 +390,7 @@ public:
     void removeAtTail() {
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             Node<T>* del = tail;
@@ -359,7 +404,8 @@ public:
 
     void removeAt(int index) {
         if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+            cout << "Invalid Range"; 
+            return;   
         }
         else if(index == 0) {removeAtHead();}
         else if(index == size - 1) {removeAtTail();}
@@ -381,6 +427,7 @@ public:
         Node<T>* current = head;
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             while (current != NULL)
@@ -412,6 +459,7 @@ public:
     bool isExist(T element) {
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return false;
         }
         Node<T>* current = head;
         while (current != NULL)
@@ -424,32 +472,58 @@ public:
         return false; 
     }
 
+    bool isItemAtEqual(T element, int index) {
+       if(index < 0 || index >= size) {
+            cout << "Invalid Range";
+            return false;    
+        }
+        else if(this->isEmpty()) {
+            cout << "List Is Empty!" << endl;
+            return false;
+        }
+        Node<T>* current = head;
+        for(int i = 0;i < index;i++)
+            current = current->next;
+
+        return current->data == element;  
+    }
+
     bool isEmpty() {return head == NULL;}
 // Boolean Functions End 
 
 // Retrieve, Replace & Swap Funcations Start
     T retrieveAt(int index) {
-        if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+        if (index < 0 || index >= size) {
+            throw out_of_range("Invalid Range");
         }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
+
+        if (this->isEmpty()) {
+            throw runtime_error("List Is Empty!");
         }
-        else {
-            Node<T>* current = head;
-            for(int i = 0;i < index;i++)
-                current = current->next;
-            
-            return current->data;
-        }  
+
+        Node<T>* current = head;
+        for (int i = 0; i < index; i++) {
+            if (current == NULL) {
+                throw out_of_range("Invalid Range");
+            }
+            current = current->next;
+        }
+
+        if (current == NULL) {
+            throw out_of_range("Invalid Range");
+        }
+
+        return current->data;  
     }
 
     void replaceAt(T newElement, int index) {
         if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+            cout << "Invalid Range"; 
+            return;   
         }
         else if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
             Node<T>* current = head;
@@ -460,42 +534,54 @@ public:
         }    
     }
 
-    bool isItemAtEqual(T element, int index) {
-       if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
-        }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
-        }
-        else {
-            Node<T>* current = head;
-            for(int i = 0;i < index;i++)
-                current = current->next;
-
-            return current->data == element;
-        }  
-    }
-
     void swap (int firstIndex, int secondIndex) {
         if((firstIndex < 0 || firstIndex >= size) && (secondIndex < 0 || secondIndex >= size)) {
-            cout << "Invalid Range";    
+            cout << "Invalid Range" << endl;
+            return;    
         }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
-        }
-        else {
-            Node<T>* firstNode = head; 
-            Node<T>* secondNode = head;
-            Node<T>* temp = NULL;
-            for(int i = 0;i < firstIndex;i++) 
-                firstNode = firstNode->next;
-            for(int i = 0;i < secondIndex;i++) 
-                secondNode = secondNode->next;
 
-            temp = firstNode->next;
-            firstNode->next = secondNode->next;
-            secondNode->next = temp;
-        }          
+        if(this->isEmpty()) {
+            cout << "List Is Empty!" << endl;
+            return;
+        }
+        
+        if(firstIndex == secondIndex) {
+            return;
+        } 
+
+        Node<T>* prevFirstNode = NULL;
+        Node<T>* firstNode = head;
+        for (int i = 0; i < firstIndex; ++i) {
+            prevFirstNode = firstNode;
+            firstNode = firstNode->next;
+        }
+        
+        Node<T>* prevSecondNode = NULL;
+        Node<T>* secondNode = head;
+        for (int i = 0; i < secondIndex; ++i) {
+            prevSecondNode = secondNode;
+            secondNode = secondNode->next;
+        }
+
+        if (prevFirstNode != NULL) {
+        prevFirstNode->next = secondNode;
+        } else {
+            head = secondNode;
+        }
+
+        if (prevSecondNode != NULL) {
+            prevSecondNode->next = firstNode;
+        } else {
+            head = firstNode;
+        }
+
+        Node<T>* tempNext = secondNode->next;
+        secondNode->next = firstNode->next;
+        firstNode->next = tempNext;
+
+        Node<T>* tempPrev = secondNode->previous;
+        secondNode->previous = firstNode->previous;
+        firstNode->previous = tempPrev;            
     }
 
 // Retrieve, Replace & Swap Funcations End
@@ -520,6 +606,11 @@ public:
         }
         else {
             newNode->next = head;
+            Node<T>* last = head;
+            while (last->next != head) {
+                last = last->next;
+            }
+            last->next = newNode;
             head = newNode;
         }
     }
@@ -593,7 +684,7 @@ public:
             }
             prev->next = head;
             delete del;
-            size--
+            size--;
         }
     }
 
@@ -622,14 +713,13 @@ public:
         Node<T>* current = head;
         if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
         else {
-            while (current != NULL)
-            {
-                cout << current->data << '\t';
-                current = current->next;
-            }
-            cout << endl;
+            do {
+            cout << current->data << '\t';
+            current = current->next;
+            } while (current != head);
         }
     }
 
@@ -642,7 +732,6 @@ public:
             delete prev;
         }
         head = NULL;
-        tail = NULL;
         size = 0;
     }
 
@@ -655,14 +744,29 @@ public:
             cout << "List Is Empty!" << endl;
         }
         Node<T>* current = head;
-        while (current != NULL)
-        {
+        do {
             if(current->data == element) {
                 return true;
             }
             current = current->next; 
-        }      
+        } while (current != head);      
         return false; 
+    }
+
+    bool isItemAtEqual(T element, int index) {
+       if(index < 0 || index >= size) {
+            cout << "Invalid Range";
+            return false;    
+        }
+        else if(this->isEmpty()) {
+            cout << "List Is Empty!" << endl;
+            return false;
+        }
+        Node<T>* current = head;
+        for(int i = 0;i < index;i++)
+            current = current->next;
+
+        return current->data == element; 
     }
 
     bool isEmpty() {return head == NULL;}
@@ -670,19 +774,27 @@ public:
 
 // Retrieve, Replace & Swap Funcations Start
     T retrieveAt(int index) {
-        if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
+        if (index < 0 || index >= size) {
+            throw out_of_range("Invalid Range");
         }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
+
+        if (this->isEmpty()) {
+            throw runtime_error("List Is Empty!");
         }
-        else {
-            Node<T>* current = head;
-            for(int i = 0;i < index;i++)
-                current = current->next;
-            
-            return current->data;
-        }  
+
+        Node<T>* current = head;
+        for (int i = 0; i < index; i++) {
+            if (current == NULL) {
+                throw out_of_range("Invalid Range");
+            }
+            current = current->next;
+        }
+
+        if (current == NULL) {
+            throw out_of_range("Invalid Range");
+        }
+
+        return current->data;
     }
 
     void replaceAt(T newElement, int index) {
@@ -701,72 +813,146 @@ public:
         }    
     }
 
-    bool isItemAtEqual(T element, int index) {
-       if(index < 0 || index >= size) {
-            cout << "Invalid Range";    
-        }
-        else if(this->isEmpty()) {
-            cout << "List Is Empty!" << endl;
-        }
-        else {
-            Node<T>* current = head;
-            for(int i = 0;i < index;i++)
-                current = current->next;
-
-            return current->data == element;
-        }  
-    }
-
     void swap (int firstIndex, int secondIndex) {
-        if((firstIndex < 0 || firstIndex >= size) && (secondIndex < 0 || secondIndex >= size)) {
-            cout << "Invalid Range";    
+        if(firstIndex < 0 || firstIndex >= size || secondIndex < 0 || secondIndex >= size) {
+            cout << "Invalid Range" << endl;
+            return;    
         }
-        else if(this->isEmpty()) {
+
+        if(this->isEmpty()) {
             cout << "List Is Empty!" << endl;
+            return;
         }
-        else {
-            Node<T>* firstNode = head; 
-            Node<T>* secondNode = head;
-            Node<T>* temp = NULL;
-            for(int i = 0;i < firstIndex;i++) 
-                firstNode = firstNode->next;
-            for(int i = 0;i < secondIndex;i++) 
-                secondNode = secondNode->next;
+        
+        if(firstIndex == secondIndex) {
+            return;
+        } 
 
-            temp = firstNode->next;
-            firstNode->next = secondNode->next;
-            secondNode->next = temp;
-        }          
+        Node<T>* prevFirstNode = NULL;
+        Node<T>* firstNode = head;
+        for (int i = 0; i < firstIndex; ++i) {
+            prevFirstNode = firstNode;
+            firstNode = firstNode->next;
+        }
+        
+        Node<T>* prevSecondNode = NULL;
+        Node<T>* secondNode = head;
+        for (int i = 0; i < secondIndex; ++i) {
+            prevSecondNode = secondNode;
+            secondNode = secondNode->next;
+        }
+
+        if (prevFirstNode != NULL) {
+            prevFirstNode->next = secondNode;
+        } else {
+            head = secondNode;
+        }
+
+        if (prevSecondNode != NULL) {
+            prevSecondNode->next = firstNode;
+        } else {
+            head = firstNode;
+        }
+
+        Node<T>* temp = secondNode->next;
+        secondNode->next = firstNode->next;
+        firstNode->next = temp;
+
     }
-
 // Retrieve, Replace & Swap Funcations End
 };
 
 int main() {
 
-    SingleLinkedList<int> ll; 
-    ll.insertAtHead(20);
-    ll.insertAtHead(10);
-    ll.print();
-    
-    ll.insertAtTail(50);
-    ll.insertAtTail(70);
-    ll.print();
+    // singleLinkedList<int> sll; 
+    // sll.insertAtHead(12);
+    // sll.insertAtHead(13);
+    // sll.insertAtTail(15);
+    // sll.insertAt(14, 2);
+    // sll.print();
 
-    ll.insertAtHead(5);
-    ll.print();
+    // cout << '\n';
 
-    ll.insertAt(25,3);
-    ll.print();
+    // sll.removeAt(2);
+    // sll.removeAtHead();
+    // sll.removeAtTail();
+    // sll.print();
 
-    ll.removeAtHead();
-    ll.print();
+    // cout << '\n';
 
-    ll.removeAtTail();
-    ll.print();
+    // cout << sll.linkedListSize() << '\t';
+    // cout << sll.isEmpty() << '\t';
+    // cout << sll.isExist(12) << '\t';
+    // cout << sll.isExist(50) << '\t';
+    // cout << sll.isItemAtEqual(14, 2) << '\t';  
 
-    ll.removeAt(1);
-    ll.print();
+    // cout << '\n';
 
-    cout << ll.isExist(20);
+    // cout << sll.retrieveAt(3) << '\n';
+    // sll.replaceAt(16, 2);
+    // sll.swap(0, 1);
+    // sll.print();
+
+    // cout << '\n';
+
+    // doubleLinkedList<int> dll;
+
+    // dll.insertAtHead(12);
+    // dll.insertAtHead(13);
+    // dll.insertAtTail(15);
+    // dll.insertAt(14, 2);
+    // dll.print();
+
+    // cout << '\n';
+
+    // dll.removeAt(2);
+    // dll.removeAtHead();
+    // dll.removeAtTail();
+    // dll.print();
+
+    // cout << '\n';
+
+    // cout << dll.linkedListSize() << '\t';
+    // cout << dll.isEmpty() << '\t';
+    // cout << dll.isExist(12) << '\t';
+    // cout << dll.isExist(50) << '\t';
+    // cout << dll.isItemAtEqual(14, 2) << '\t';  
+
+    // cout << '\n';
+
+    // cout << dll.retrieveAt(3) << '\n';
+    // dll.replaceAt(16, 2);
+    // dll.swap(0, 1);
+    // dll.print();
+
+
+    circularLinkedList<int> cll;
+
+    cll.insertAtHead(12);
+    cll.insertAtHead(13);
+    cll.insertAtTail(15);
+    cll.insertAt(14, 2);
+    cll.print();
+
+    cout << '\n';
+
+    // cll.removeAt(2);
+    // cll.removeAtHead();
+    // cll.removeAtTail();
+    // cll.print();
+
+    cout << '\n';
+
+    cout << cll.linkedListSize() << '\t';
+    cout << cll.isEmpty() << '\t';
+    cout << cll.isExist(12) << '\t';
+    cout << cll.isExist(50) << '\t';
+    cout << cll.isItemAtEqual(14, 2) << '\t';  
+
+    cout << '\n';
+
+    cout << cll.retrieveAt(3) << '\n';
+    cll.replaceAt(16, 2);
+    cll.swap(0, 1);
+    cll.print();
 }
