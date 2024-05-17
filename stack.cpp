@@ -2,55 +2,57 @@
 using namespace std;
 
 template <typename T>
-class Node {
-
+class Node
+{
 public:
-
     T data;
-    Node<T>* next;
-    Node() {
+    Node<T> *next;
+    Node()
+    {
         next = NULL;
     }
-
 };
 
 template <typename T>
-class stack {
-
+class stack
+{
 private:
-
-    Node<T>* head = NULL;
+    Node<T> *head = NULL;
     int size = 0;
 
 public:
-
-    bool isEmpty() {
+    bool isEmpty()
+    {
         return (head == NULL);
     }
-    
-    void push(T element) {
-        Node<T>* node = new Node<T>;
+
+    void push(T element)
+    {
+        Node<T> *node = new Node<T>;
         node->data = element;
         size++;
-        
-        if(isEmpty()) {
+
+        if (isEmpty())
+        {
             head = node;
         }
-        else {
+        else
+        {
             node->next = head;
             head = node;
         }
-        
     }
 
-    T pop() {
-        
-        if(isEmpty()) {
+    T pop()
+    {
+        if (isEmpty())
+        {
             throw runtime_error("Stack Is Empty!");
         }
-        else {
+        else
+        {
             size--;
-            Node<T>* temp = head;
+            Node<T> *temp = head;
             head = head->next;
             T poppedData = temp->data;
             delete temp;
@@ -58,14 +60,17 @@ public:
         }
     }
 
-    void print() {
-        Node<T>* current = head;
-        
-        if(isEmpty()){
+    void print()
+    {
+        Node<T> *current = head;
+
+        if (isEmpty())
+        {
             cout << "Stack Is Empty";
         }
 
-        else{
+        else
+        {
             while (current != NULL)
             {
                 cout << current->data << "\t";
@@ -75,23 +80,28 @@ public:
         }
     }
 
-    int stackSize() {
+    int stackSize()
+    {
         return size;
     }
 
-    T top() {
+    T top()
+    {
         if (isEmpty())
         {
             throw runtime_error("Stack Is Empty!");
         }
-        else {
+        else
+        {
             return head->data;
         }
     }
 
-    void clear() {
-        while (head != NULL) {
-            Node<T>* temp = head;
+    void clear()
+    {
+        while (head != NULL)
+        {
+            Node<T> *temp = head;
             head = head->next;
             delete temp;
         }
@@ -99,14 +109,16 @@ public:
     }
 };
 
-int main() {
+int main()
+{
     stack<string> s;
     s.push("nour");
     s.push("ahmed");
     s.push("careem");
 
+    
     s.pop();
-
+    s.pop();
 
     s.print();
     return 0;
